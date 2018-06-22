@@ -5,6 +5,7 @@ import { Editor } from 'slate-react'
 import AutoReplace from 'slate-auto-replace'
 import InsertImages from 'slate-drop-or-paste-images'
 import Plain from 'slate-plain-serializer'
+// TODO: markdown marshaller
 
 import './styles.css'
 import ImageRenderer from './ImageRenderer.jsx'
