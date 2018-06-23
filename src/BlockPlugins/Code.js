@@ -8,11 +8,11 @@ import SoftBreak from 'slate-soft-break'
 import { Hotkey, RenderNode } from '../utils'
 
 function isCodeBlock(change) {
-  return change.value.blocks.some(block => block.type === 'code')
+  return change.value.blocks.some(block => block.type === 'code_block')
 }
 
 function addCodeType(change) {
-  change.setBlocks('code')
+  change.setBlocks('code_block')
 }
 
 function removeCodeType(change) {
@@ -56,10 +56,10 @@ function CodeBlockPlugin({ language = '' } = {}) {
       }),
       // Allow soft breaks so that no extra block is created
       SoftBreak({
-        onlyIn: ['code']
+        onlyIn: ['code_block']
       }),
       // Define how to render a code block
-      RenderNode('code', CodeRenderer)
+      RenderNode('code_block', CodeRenderer)
     ]
   }
 }

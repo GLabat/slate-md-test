@@ -1,9 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { Value } from 'slate'
 import { Editor } from 'slate-react'
 
-import Plain from 'slate-plain-serializer'
-// TODO: markdown marshaller
+import { State } from 'markup-it'
+import markdown from 'markup-it/lib/markdown'
 
 import './styles.css'
 
@@ -18,10 +19,7 @@ import ImagePlugin from './BlockPlugins/Image.jsx'
 import CodeBlockPlugin from './BlockPlugins/Code'
 import MarkdownPlugin from './BlockPlugins/Markdown'
 
-const existingValue = localStorage.getItem('content')
-const initialValue = Plain.deserialize(
-  existingValue || 'A string of plain text.'
-)
+import readme from '../README.md'
 
 /**
  *
@@ -81,16 +79,24 @@ const plugins = [
   ...ImagePlugin().plugins
 ]
 
+const mdParser = State.create(markdown)
+const existingValue = localStorage.getItem('content') || readme
+const initialValueDocument = mdParser.deserializeToDocument(existingValue)
+
 class App extends React.Component {
   state = {
-    value: initialValue
+    value: Value.create({ document: initialValueDocument })
   }
 
   // On change, update the app's React state with the new editor value.
   onChange = ({ value }) => {
-    if (value.document != this.state.value.document) {
-      const content = Plain.serialize(value)
-      localStorage.setItem('content', content)
+    if (value.document !== this.state.value.document) {
+      try {
+        const content = mdParser.serializeDocument(value.document)
+        localStorage.setItem('content', content)
+      } catch (e) {
+        console.error(e)
+      }
     }
 
     this.setState({ value })
@@ -98,17 +104,30 @@ class App extends React.Component {
 
   render() {
     return (
-      <div>
-        <Editor
-          plugins={plugins}
-          value={this.state.value}
-          onChange={this.onChange}
-          renderNode={this.renderNode}
-          renderMark={this.renderMark}
-        />
+      <React.Fragment>
+        <div className="container">
+          <Editor
+            plugins={plugins}
+            value={this.state.value}
+            onChange={this.onChange}
+            renderNode={this.renderNode}
+            renderMark={this.renderMark}
+          />
+          <textarea
+            onChange={e =>
+              this.setState({
+                value: Value.create({
+                  document: mdParser.deserializeToDocument(e.target.value)
+                })
+              })
+            }
+            value={mdParser.serializeDocument(this.state.value.document)}
+          />
+        </div>
+
         <hr />
         <pre>{JSON.stringify(this.state.value, null, 2)}</pre>
-      </div>
+      </React.Fragment>
     )
   }
 }

@@ -6,11 +6,15 @@ import React from 'react'
 
 import AutoReplace from 'slate-auto-replace'
 
+// Import block types
+//https://github.com/GitbookIO/markup-it/blob/master/src/constants/blocks.js
+
 /**
  * Get the block type for a series of auto-markdown shortcut `chars`.
  *
  * @param {String} chars
  * @return {String} block
+ *
  */
 
 const getBlockType = chars => {
@@ -18,21 +22,21 @@ const getBlockType = chars => {
     case '*':
     case '-':
     case '+':
-      return 'list-item'
+      return 'list_item'
     case '>':
-      return 'block-quote'
+      return 'blockquote'
     case '#':
-      return 'heading-one'
+      return 'header_one'
     case '##':
-      return 'heading-two'
+      return 'header_two'
     case '###':
-      return 'heading-three'
+      return 'header_three'
     case '####':
-      return 'heading-four'
+      return 'header_four'
     case '#####':
-      return 'heading-five'
+      return 'header_five'
     case '######':
-      return 'heading-six'
+      return 'header_six'
     default:
       return null
   }
@@ -42,28 +46,28 @@ const renderNode = props => {
   const { attributes, children, node } = props
 
   switch (node.type) {
-    case 'block-quote':
+    case 'blockquote':
       return <blockquote {...attributes}>{children}</blockquote>
     case 'bulleted-list':
       return <ul {...attributes}>{children}</ul>
-    case 'list-item':
+    case 'list_item':
       return <li {...attributes}>{children}</li>
-    case 'heading-one':
+    case 'header_one':
       return <h1 {...attributes}>{children}</h1>
-    case 'heading-two':
+    case 'header_two':
       return <h2 {...attributes}>{children}</h2>
-    case 'heading-three':
+    case 'header_three':
       return <h3 {...attributes}>{children}</h3>
-    case 'heading-four':
+    case 'header_four':
       return <h4 {...attributes}>{children}</h4>
-    case 'heading-five':
+    case 'header_five':
       return <h5 {...attributes}>{children}</h5>
-    case 'heading-six':
+    case 'header_six':
       return <h6 {...attributes}>{children}</h6>
   }
 }
 
-function MarkdownPlugins(options) {
+function MarkdownPlugin(options) {
   return {
     changes: {},
     helpers: {
@@ -98,7 +102,7 @@ function MarkdownPlugins(options) {
         before: /^(##)$/,
         transform: (transform, e, matches) => {
           console.log(matches)
-          return transform.setBlocks({ type: 'title2' })
+          return transform.setBlocks({ type: 'heading-one' })
         }
       }),
       // Quote
@@ -106,7 +110,7 @@ function MarkdownPlugins(options) {
         trigger: 'space',
         before: /^(>)$/,
         transform: (transform, e, matches) => {
-          return transform.setBlocks({ type: 'quote' })
+          return transform.setBlocks({ type: 'blockquote' })
         }
       }),
       // List
@@ -115,7 +119,7 @@ function MarkdownPlugins(options) {
         before: /^(\*|-)$/,
         transform: (transform, e, matches) => {
           console.log('plop')
-          return transform.setBlocks({ type: 'list' })
+          return transform.setBlocks({ type: 'list_item' })
         }
       }),
       AutoReplace({
@@ -131,4 +135,4 @@ function MarkdownPlugins(options) {
   }
 }
 
-export default MarkdownPlugins
+export default MarkdownPlugin
