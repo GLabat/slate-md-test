@@ -1,5 +1,8 @@
 import React from 'react'
 
+import InsertImages from 'slate-drop-or-paste-images'
+import { RenderNode } from '../utils'
+
 /**
  * Image node renderer.
  *
@@ -29,4 +32,23 @@ class Image extends React.Component {
   }
 }
 
-export default Image
+function ImagePlugin(options) {
+  return {
+    components: Image,
+    plugins: [
+      InsertImages({
+        extensions: ['png'],
+        insertImage: (transform, file) => {
+          return transform.insertBlock({
+            type: 'image',
+            isVoid: true,
+            data: { file }
+          })
+        }
+      }),
+      RenderNode('image', Image)
+    ]
+  }
+}
+
+export default ImagePlugin
